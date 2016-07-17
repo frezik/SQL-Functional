@@ -15,9 +15,17 @@ our @EXPORT = @EXPORT_OK;
 # ABSTRACT: Create SQL through abstract functions
 
 
-sub SELECT (@)
+sub SELECT ($@)
 {
-    my (@substrs) = @_;
+    my ($fields, @substrs) = @_;
+
+    if( ref($fields) eq 'ARRAY' ) {
+        unshift @substrs, join( ', ', @$fields );
+    }
+    else {
+        unshift @substrs, $fields;
+    }
+
     return join ' ', 'SELECT', @substrs;
 }
 
