@@ -21,29 +21,34 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::FromClause;
-
+package SQL::Functional::TableClause;
 use v5.14;
 use warnings;
 use Moose;
 use namespace::autoclean;
 use SQL::Functional::Clause;
-use SQL::Functional::TableClause;
 
 with 'SQL::Functional::Clause';
 
-has tables => (
+
+has name => (
     is => 'ro',
-    isa => 'ArrayRef[SQL::Functional::TableClause]',
-    auto_deref => 1,
+    isa => 'Str',
     required => 1,
 );
 
 
+sub field
+{
+    my ($self, $field) = @_;
+    my $table_name = $self->name;
+    return $table_name . '.' . $field;
+}
+
 sub to_string
 {
     my ($self) = @_;
-    return 'FROM ' . join( ', ', map { $_->to_string } $self->tables );
+    return $self->name;
 }
 
 

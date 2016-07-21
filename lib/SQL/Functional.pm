@@ -26,8 +26,10 @@ package SQL::Functional;
 use v5.14;
 use warnings;
 use SQL::Functional::FromClause;
+use SQL::Functional::InnerJoinClause;
 use SQL::Functional::MatchClause;
 use SQL::Functional::OrderByClause;
+use SQL::Functional::TableClause;
 use SQL::Functional::WhereClause;
 use Exporter;
 our @ISA = qw{ Exporter };
@@ -41,6 +43,7 @@ our @EXPORT_OK = qw{
     table
     ORDER_BY
     DESC
+    INNER_JOIN
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -74,7 +77,10 @@ sub star ()
 sub table($)
 {
     my ($name) = @_;
-    return $name;
+    my $table = SQL::Functional::TableClause->new({
+        name => $name,
+    });
+    return $table;
 }
 
 sub FROM (@)
@@ -130,6 +136,17 @@ sub DESC($)
     # else to make it one. Is there an argument besides consistency? 
     # Seems just fine like this so far . . . 
     return "$field DESC";
+}
+
+sub INNER_JOIN($$$)
+{
+    my ($table, $field1, $field2) = @_;
+    my $clause = SQL::Functional::InnerJoinClause->new(
+        table => $table,
+        field1 => $field1,
+        field2 => $field2,
+    );
+    return $clause;
 }
 
 
