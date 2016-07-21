@@ -21,12 +21,21 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 6;
+package SQL::Functional::Clause;
 use v5.14;
+use warnings;
+use Moose::Role;
 
-use_ok( 'SQL::Functional::Clause' );
-use_ok( 'SQL::Functional::FromClause' );
-use_ok( 'SQL::Functional::MatchClause' );
-use_ok( 'SQL::Functional::OrderByClause' );
-use_ok( 'SQL::Functional::WhereClause' );
-use_ok( 'SQL::Functional' );
+has params => (
+    is => 'ro',
+    isa => 'ArrayRef[Str]',
+    default => sub {[]},
+    auto_deref => 1,
+);
+
+requires 'to_string';
+
+
+1;
+__END__
+
