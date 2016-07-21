@@ -21,11 +21,14 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 1;
+#use Test::More tests => 2;
+use Test::More skip_all => 'Not yet implemented';
 use v5.14;
 use SQL::Functional;
 
-
-my ($sql, @sql_params) = SELECT [qw{ bar baz }], FROM 'foo';
-cmp_ok( $sql, 'eq', 'SELECT bar, baz FROM foo',
-    'Select with fields statement' );
+my ($sql, @sql_params) = SELECT star,
+    FROM( 'foo' ),
+    WHERE match( 'bar', '=', 1 );
+cmp_ok( $sql, 'eq', 'SELECT * FROM foo WHERE bar = ?',
+    'Select statement with param' );
+is_deeply( \@sql_params, [1], "Correct SQL params" );

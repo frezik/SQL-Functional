@@ -25,5 +25,5 @@ use Test::More tests => 1;
 use v5.14;
 use SQL::Functional;
 
-my $sql = SELECT star, FROM 'foo';
+my ($sql, @sql_params) = SELECT star, FROM 'foo';
 cmp_ok( $sql, 'eq', 'SELECT * FROM foo', 'Basic select statement' );

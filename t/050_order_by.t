@@ -21,11 +21,16 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 1;
+use Test::More tests => 2;
 use v5.14;
 use SQL::Functional;
 
+my ($sql, @sql_params) = SELECT star,
+    FROM( 'foo' ),
+    ORDER_BY 'bar';
+cmp_ok( $sql, 'eq', 'SELECT * FROM foo ORDER BY bar' );
 
-my ($sql, @sql_params) = SELECT [qw{ bar baz }], FROM 'foo';
-cmp_ok( $sql, 'eq', 'SELECT bar, baz FROM foo',
-    'Select with fields statement' );
+($sql, @sql_params) = SELECT star,
+    FROM( 'foo' ),
+    ORDER_BY( DESC 'bar', 'baz' );
+cmp_ok( $sql, 'eq', 'SELECT * FROM foo ORDER BY bar DESC, baz' );
