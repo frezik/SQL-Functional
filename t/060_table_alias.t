@@ -21,48 +21,25 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::TableClause;
+use Test::More tests => 2;
 use v5.14;
-use warnings;
-use Moose;
-use namespace::autoclean;
-use SQL::Functional::Clause;
+use SQL::Functional;
 
-with 'SQL::Functional::Clause';
+my $foo_tbl = table 'foo';
+my $bar_tbl = table 'bar';
+$foo_tbl->as( 'f' );
+$bar_tbl->as( 'b' );
 
-
-has name => (
-    is => 'ro',
-    isa => 'Str',
-    required => 1,
-);
-has as => (
-    is => 'rw',
-    isa => 'Maybe[Str]',
-    default => undef,
-);
-
-
-sub field
-{
-    my ($self, $field) = @_;
-    my $table_name = $self->as // $self->name;
-    return $table_name . '.' . $field;
-}
-
-sub to_string
-{
-    my ($self) = @_;
-    my $as = $self->as;
-
-    my $str = $self->name;
-    $str .= ' AS ' . $as if defined $as;
-    return $str;
-}
-
-
-no Moose;
-__PACKAGE__->meta->make_immutable;
-1;
-__END__
-
+my ($sql, @sql_params) = SELECT [
+        $foo_tbl->field( 'qux' ),
+        $foo_tbl->field( 'quux' ),
+        $bar_tbl->field( 'quuux' ),
+    ],
+    FROM( $foo_tbl ), 
+    INNER_JOIN(
+        $bar_tbl, $foo_tbl->field( 'id' ), $bar_tbl->field( 'foo_id' )
+    ),
+    WHERE match( $foo_tbl->field( 'baz' ), '=', 1 );
+cmp_ok( $sql, 'eq', 'SELECT f.qux, f.quux, b.quuux FROM foo AS f INNER JOIN bar AS b ON f.id = b.foo_id WHERE f.baz = ?',
+    'Table alias set' );
+is_deeply( \@sql_params, [1], "Correct SQL params" );
