@@ -35,5 +35,5 @@ my ($sql, @sql_params) = SELECT [qw{ bar baz }],
         ),
     );
 cmp_ok( $sql, 'eq', 'SELECT bar, baz FROM foo WHERE (bar = ? AND (baz = ? OR qux = ?))',
-    'Select with fields statement' );
+    'Select with nested AND and OR' );
 is_deeply( \@sql_params, [ 1, 2, 3 ], "SQL params are correct" );

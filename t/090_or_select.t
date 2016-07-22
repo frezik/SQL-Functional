@@ -32,5 +32,5 @@ my ($sql, @sql_params) = SELECT [qw{ bar baz }],
         match( 'baz', '=', 2 ),
     );
 cmp_ok( $sql, 'eq', 'SELECT bar, baz FROM foo WHERE (bar = ? OR baz = ?)',
-    'Select with fields statement' );
+    'Select with OR' );
 is_deeply( \@sql_params, [ 1, 2 ], "SQL params are correct" );
