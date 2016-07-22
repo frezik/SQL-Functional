@@ -21,18 +21,19 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 12;
+use Test::More tests => 2;
 use v5.14;
+use SQL::Functional;
 
-use_ok( 'SQL::Functional::Clause' );
-use_ok( 'SQL::Functional::AndClause' );
-use_ok( 'SQL::Functional::FromClause' );
-use_ok( 'SQL::Functional::InnerJoinClause' );
-use_ok( 'SQL::Functional::MatchClause' );
-use_ok( 'SQL::Functional::OrClause' );
-use_ok( 'SQL::Functional::OrderByClause' );
-use_ok( 'SQL::Functional::PlaceholderClause' );
-use_ok( 'SQL::Functional::WhereClause' );
-use_ok( 'SQL::Functional::SelectClause' );
-use_ok( 'SQL::Functional::SubSelectClause' );
-use_ok( 'SQL::Functional' );
+my ($sql, @sql_params) = SELECT [qw{ bar baz }],
+    FROM( 'foo' ),
+    WHERE AND(
+        match( 'bar', '=', 1 ),
+        OR(
+            match( 'baz', '=', 2 ),
+            match( 'qux', '=', 3 ),
+        ),
+    );
+cmp_ok( $sql, 'eq', 'SELECT bar, baz FROM foo WHERE (bar = ? AND (baz = ? OR qux = ?))',
+    'Select with fields statement' );
+is_deeply( \@sql_params, [ 1, 2, 3 ], "SQL params are correct" );

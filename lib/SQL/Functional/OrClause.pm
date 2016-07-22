@@ -21,18 +21,44 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 12;
-use v5.14;
+package SQL::Functional::OrClause;
 
-use_ok( 'SQL::Functional::Clause' );
-use_ok( 'SQL::Functional::AndClause' );
-use_ok( 'SQL::Functional::FromClause' );
-use_ok( 'SQL::Functional::InnerJoinClause' );
-use_ok( 'SQL::Functional::MatchClause' );
-use_ok( 'SQL::Functional::OrClause' );
-use_ok( 'SQL::Functional::OrderByClause' );
-use_ok( 'SQL::Functional::PlaceholderClause' );
-use_ok( 'SQL::Functional::WhereClause' );
-use_ok( 'SQL::Functional::SelectClause' );
-use_ok( 'SQL::Functional::SubSelectClause' );
-use_ok( 'SQL::Functional' );
+use v5.14;
+use warnings;
+use Moose;
+use namespace::autoclean;
+use SQL::Functional::Clause;
+
+with 'SQL::Functional::Clause';
+
+has clauses => (
+    is => 'ro',
+    isa => 'ArrayRef[SQL::Functional::Clause]',
+    required => 1,
+    auto_deref => 1,
+);
+
+sub to_string
+{
+    my ($self) = @_;
+    my @clause_strs = map {
+        $_->to_string
+    } $self->clauses;
+
+    my $str = '(' . join( ' OR ', @clause_strs ) . ')';
+    return $str;
+}
+
+sub get_params
+{
+    my ($self) = @_;
+    my @params = map { $_->get_params } $self->clauses;
+    return @params;
+}
+
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
+1;
+__END__
+

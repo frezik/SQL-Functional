@@ -25,9 +25,11 @@ package SQL::Functional;
 
 use v5.14;
 use warnings;
+use SQL::Functional::AndClause;
 use SQL::Functional::FromClause;
 use SQL::Functional::InnerJoinClause;
 use SQL::Functional::MatchClause;
+use SQL::Functional::OrClause;
 use SQL::Functional::OrderByClause;
 use SQL::Functional::PlaceholderClause;
 use SQL::Functional::SelectClause;
@@ -48,6 +50,8 @@ our @EXPORT_OK = qw{
     DESC
     INNER_JOIN
     SUBSELECT
+    AND
+    OR
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -108,7 +112,6 @@ sub match($$$)
 {
     my ($field, $op, $value) = @_;
 
-DEBUG: $DB::single = 1;
     my $clause_value = 
         ref($value) && $value->does( 'SQL::Functional::Clause' )
         ? $value
@@ -159,6 +162,24 @@ sub SUBSELECT($$@)
         fields => ref $fields ? $fields : [$fields],
         clauses => \@clauses,
     );
+    return $clause;
+}
+
+sub AND
+{
+    my (@clauses) = @_;
+    my $clause = SQL::Functional::AndClause->new({
+        clauses => \@clauses,
+    });
+    return $clause;
+}
+
+sub OR
+{
+    my (@clauses) = @_;
+    my $clause = SQL::Functional::OrClause->new({
+        clauses => \@clauses,
+    });
     return $clause;
 }
 
