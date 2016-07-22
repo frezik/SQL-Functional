@@ -21,27 +21,56 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::Clause;
+package SQL::Functional::SelectClause;
+
 use v5.14;
 use warnings;
-use Moose::Role;
+use Moose;
+use namespace::autoclean;
+use SQL::Functional::Clause;
 
-has params => (
+with 'SQL::Functional::Clause';
+
+has fields => (
     is => 'ro',
     isa => 'ArrayRef[Str]',
-    default => sub {[]},
+    required => 1,
+    auto_deref => 1,
+);
+has clauses => (
+    is => 'ro',
+    isa => 'ArrayRef[SQL::Functional::Clause]',
+    required => 1,
     auto_deref => 1,
 );
 
-requires 'to_string';
+
+sub to_string
+{
+    my ($self) = @_;
+    my @fields = $self->fields;
+    my @clauses = $self->clauses;
+
+    my @clause_strs;
+    foreach my $clause (@clauses) {
+        push @clause_strs, $clause->to_string;
+    }
+
+    my $str = 'SELECT ' . join( ', ', @fields )
+        . ' ' . join( ' ', @clause_strs );
+    return $str;
+}
 
 sub get_params
 {
     my ($self) = @_;
-    return $self->params;
+    my @params = map { $_->get_params } $self->clauses;
+    return @params;
 }
 
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
 1;
 __END__
 

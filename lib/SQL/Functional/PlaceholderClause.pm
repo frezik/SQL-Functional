@@ -21,27 +21,34 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::Clause;
+package SQL::Functional::PlaceholderClause;
+
 use v5.14;
 use warnings;
-use Moose::Role;
+use Moose;
+use namespace::autoclean;
+use SQL::Functional::Clause;
 
-has params => (
+with 'SQL::Functional::Clause';
+
+
+has value => (
     is => 'ro',
-    isa => 'ArrayRef[Str]',
-    default => sub {[]},
-    auto_deref => 1,
+    isa => 'Str',
+    required => 1,
 );
 
-requires 'to_string';
+sub to_string { '?' }
 
 sub get_params
 {
     my ($self) = @_;
-    return $self->params;
+    return $self->value;
 }
 
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
 1;
 __END__
 

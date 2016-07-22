@@ -29,6 +29,9 @@ use SQL::Functional::FromClause;
 use SQL::Functional::InnerJoinClause;
 use SQL::Functional::MatchClause;
 use SQL::Functional::OrderByClause;
+use SQL::Functional::PlaceholderClause;
+use SQL::Functional::SelectClause;
+use SQL::Functional::SubSelectClause;
 use SQL::Functional::TableClause;
 use SQL::Functional::WhereClause;
 use Exporter;
@@ -44,6 +47,7 @@ our @EXPORT_OK = qw{
     ORDER_BY
     DESC
     INNER_JOIN
+    SUBSELECT
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -53,20 +57,11 @@ our @EXPORT = @EXPORT_OK;
 sub SELECT ($$@)
 {
     my ($fields, @clauses) = @_;
-    my @field_strs = ref($fields)
-        ? @$fields
-        : $fields;
-
-    my @params;
-    my @clause_strs;
-    foreach my $clause (@clauses) {
-        push @params, $clause->params;
-        push @clause_strs, $clause->to_string;
-    }
-
-    my $str = 'SELECT ' . join( ', ', @field_strs )
-        . ' ' . join( ' ', @clause_strs );
-    return ($str, @params);
+    my $clause = SQL::Functional::SelectClause->new(
+        fields => ref $fields ? $fields : [$fields],
+        clauses => \@clauses,
+    );
+    return ($clause->to_string, $clause->get_params);
 }
 
 sub star ()
@@ -112,10 +107,18 @@ sub WHERE ($)
 sub match($$$)
 {
     my ($field, $op, $value) = @_;
+
+DEBUG: $DB::single = 1;
+    my $clause_value = 
+        ref($value) && $value->does( 'SQL::Functional::Clause' )
+        ? $value
+        : SQL::Functional::PlaceholderClause->new({
+            value => $value,
+        });
     my $clause = SQL::Functional::MatchClause->new({
         field => $field,
         op => $op,
-        params => [ $value ],
+        value => $clause_value,
     });
     return $clause;
 }
@@ -145,6 +148,16 @@ sub INNER_JOIN($$$)
         table => $table,
         field1 => $field1,
         field2 => $field2,
+    );
+    return $clause;
+}
+
+sub SUBSELECT($$@)
+{
+    my ($fields, @clauses) = @_;
+    my $clause = SQL::Functional::SubSelectClause->new(
+        fields => ref $fields ? $fields : [$fields],
+        clauses => \@clauses,
     );
     return $clause;
 }

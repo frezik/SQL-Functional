@@ -42,10 +42,22 @@ has op => (
     required => 1,
 );
 
+has value => (
+    is => 'ro',
+    isa => 'SQL::Functional::Clause',
+    required => 1,
+);
+
 sub to_string
 {
     my ($self) = @_;
-    return join ' ', $self->field, $self->op, '?';
+    return join ' ', $self->field, $self->op, $self->value->to_string;
+}
+
+sub get_params
+{
+    my ($self) = @_;
+    return $self->value->get_params;
 }
 
 

@@ -36,11 +36,19 @@ has 'sub_clause' => (
     required => 1,
 );
 
+
 sub to_string
 {
     my ($self) = @_;
     return 'WHERE ' . $self->sub_clause->to_string;
 }
+
+sub get_params
+{
+    my ($self) = @_;
+    return $self->sub_clause->get_params;
+}
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

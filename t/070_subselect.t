@@ -21,27 +21,17 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::Clause;
+use Test::More tests => 2;
 use v5.14;
-use warnings;
-use Moose::Role;
+use SQL::Functional;
 
-has params => (
-    is => 'ro',
-    isa => 'ArrayRef[Str]',
-    default => sub {[]},
-    auto_deref => 1,
-);
-
-requires 'to_string';
-
-sub get_params
-{
-    my ($self) = @_;
-    return $self->params;
-}
-
-
-1;
-__END__
-
+my ($sql, @sql_params) = SELECT star,
+    FROM( 'foo' ),
+    WHERE match( 'bar', 'IN', SUBSELECT(
+        ['id'],
+        FROM( 'bar_tbl' ),
+        WHERE match( 'baz', '>', 2 )
+    ));
+cmp_ok( $sql, 'eq', 'SELECT * FROM foo WHERE bar IN (SELECT id FROM bar_tbl WHERE baz > ?)',
+    'Subselect' );
+is_deeply( \@sql_params, [2], "Correct SQL params" );
