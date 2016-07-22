@@ -28,6 +28,7 @@ use warnings;
 use SQL::Functional::AndClause;
 use SQL::Functional::FromClause;
 use SQL::Functional::InnerJoinClause;
+use SQL::Functional::InsertClause;
 use SQL::Functional::MatchClause;
 use SQL::Functional::OrClause;
 use SQL::Functional::OrderByClause;
@@ -35,6 +36,7 @@ use SQL::Functional::PlaceholderClause;
 use SQL::Functional::SelectClause;
 use SQL::Functional::SubSelectClause;
 use SQL::Functional::TableClause;
+use SQL::Functional::ValuesClause;
 use SQL::Functional::WhereClause;
 use Exporter;
 our @ISA = qw{ Exporter };
@@ -52,6 +54,9 @@ our @EXPORT_OK = qw{
     SUBSELECT
     AND
     OR
+    INSERT
+    INTO
+    VALUES
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -180,6 +185,35 @@ sub OR
     my $clause = SQL::Functional::OrClause->new({
         clauses => \@clauses,
     });
+    return $clause;
+}
+
+sub INSERT ($$$)
+{
+    my ($into, $fields, $values) = @_;
+    my $clause = SQL::Functional::InsertClause->new(
+        into => $into,
+        fields => ref $fields ? $fields : [$fields],
+        values => $values,
+    );
+    return ($clause->to_string, $clause->get_params);
+}
+
+sub INTO ($)
+{
+    my ($table) = @_;
+    my $clause = SQL::Functional::TableClause->new(
+        name => $table,
+    );
+    return $clause;
+}
+
+sub VALUES ($)
+{
+    my ($values) = @_;
+    my $clause = SQL::Functional::ValuesClause->new(
+        params => $values,
+    );
     return $clause;
 }
 

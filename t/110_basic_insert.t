@@ -21,20 +21,17 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 14;
+use Test::More tests => 2;
 use v5.14;
+use SQL::Functional;
 
-use_ok( 'SQL::Functional::Clause' );
-use_ok( 'SQL::Functional::AndClause' );
-use_ok( 'SQL::Functional::FromClause' );
-use_ok( 'SQL::Functional::InnerJoinClause' );
-use_ok( 'SQL::Functional::InsertClause' );
-use_ok( 'SQL::Functional::MatchClause' );
-use_ok( 'SQL::Functional::OrClause' );
-use_ok( 'SQL::Functional::OrderByClause' );
-use_ok( 'SQL::Functional::PlaceholderClause' );
-use_ok( 'SQL::Functional::ValuesClause' );
-use_ok( 'SQL::Functional::WhereClause' );
-use_ok( 'SQL::Functional::SelectClause' );
-use_ok( 'SQL::Functional::SubSelectClause' );
-use_ok( 'SQL::Functional' );
+my ($sql, @sql_params) = INSERT INTO 'foo',
+    [
+        'bar',
+    ],
+    VALUES [
+        1,
+    ];
+cmp_ok( $sql, 'eq', 'INSERT INTO foo (bar) VALUES (?)',
+    'Basic insert statement' );
+is_deeply( \@sql_params, [1], "Placeholder param set" );
