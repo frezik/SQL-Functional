@@ -26,6 +26,7 @@ package SQL::Functional;
 use v5.14;
 use warnings;
 use SQL::Functional::AndClause;
+use SQL::Functional::DeleteClause;
 use SQL::Functional::FromClause;
 use SQL::Functional::InnerJoinClause;
 use SQL::Functional::InsertClause;
@@ -62,6 +63,7 @@ our @EXPORT_OK = qw{
     VALUES
     UPDATE
     SET
+    DELETE
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -91,6 +93,7 @@ sub table($)
     });
     return $table;
 }
+*INTO = \&table;
 
 sub FROM (@)
 {
@@ -205,15 +208,6 @@ sub INSERT ($$$)
     return ($clause->to_string, $clause->get_params);
 }
 
-sub INTO ($)
-{
-    my ($table) = @_;
-    my $clause = SQL::Functional::TableClause->new(
-        name => $table,
-    );
-    return $clause;
-}
-
 sub VALUES ($)
 {
     my ($values) = @_;
@@ -241,6 +235,16 @@ sub SET
         clauses => \@clauses,
     );
     return $clause;
+}
+
+sub DELETE ($;$)
+{
+    my ($from, $where) = @_;
+    my $clause = SQL::Functional::DeleteClause->new(
+        from => $from,
+        where => $where,
+    );
+    return ($clause->to_string, $clause->get_params);
 }
 
 
