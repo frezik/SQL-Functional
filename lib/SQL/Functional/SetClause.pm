@@ -23,6 +23,12 @@ sub to_string
     return $str;
 }
 
+sub get_params
+{
+    my ($self) = @_;
+    return map { $_->get_params } $self->clauses;
+}
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 1;

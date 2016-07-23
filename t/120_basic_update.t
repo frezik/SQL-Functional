@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 2;
+use Test::More tests => 4;
 use v5.14;
 use SQL::Functional;
 
@@ -31,5 +31,14 @@ my ($sql, @sql_params) = UPDATE 'foo', SET(
     ),
     WHERE match( 'qux', '=', 3 );
 cmp_ok( $sql, 'eq', 'UPDATE foo SET bar = ?, baz = ? WHERE qux = ?',
-    'Basic insert statement' );
+    'Basic update statement' );
 is_deeply( \@sql_params, [1, 2, 3], "Placeholder param set" );
+
+
+($sql, @sql_params) = UPDATE 'foo', SET( 
+    op( 'bar', '=', 1 ),
+    op( 'baz', '=', 2 ),
+);
+cmp_ok( $sql, 'eq', 'UPDATE foo SET bar = ?, baz = ?',
+    'Update with no WHERE clause' );
+is_deeply( \@sql_params, [1, 2], "Placeholder param set" );

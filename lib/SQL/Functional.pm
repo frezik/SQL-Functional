@@ -61,6 +61,7 @@ our @EXPORT_OK = qw{
     INTO
     VALUES
     UPDATE
+    SET
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -222,7 +223,7 @@ sub VALUES ($)
     return $clause;
 }
 
-sub UPDATE ($$$)
+sub UPDATE ($$;$)
 {
     my ($table, $set, $where) = @_;
     my $clause = SQL::Functional::UpdateClause->new(

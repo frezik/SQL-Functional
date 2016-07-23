@@ -42,7 +42,7 @@ has set => (
 );
 has where => (
     is => 'ro',
-    isa => '',
+    isa => 'Maybe[SQL::Functional::WhereClause]',
     required => 1,
 );
 
@@ -50,16 +50,21 @@ has where => (
 sub to_string
 {
     my ($self) = @_;
+    my $where = $self->where;
     my $str = 'UPDATE ' . $self->table
         . ' ' . $self->set->to_string
-        . ' ' . $self->where->to_string;
+        . (defined $where ? ' ' . $where->to_string : '');
     return $str;
 }
 
 sub get_params
 {
     my ($self) = @_;
-    return ($self->set->get_params, $self->where->get_params);
+    my $where = $self->where;
+    my @where_params = defined $where
+        ? $where->get_params
+        : ();
+    return ($self->set->get_params, @where_params);
 }
 
 
