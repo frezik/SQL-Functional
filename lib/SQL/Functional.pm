@@ -34,8 +34,10 @@ use SQL::Functional::OrClause;
 use SQL::Functional::OrderByClause;
 use SQL::Functional::PlaceholderClause;
 use SQL::Functional::SelectClause;
+use SQL::Functional::SetClause;
 use SQL::Functional::SubSelectClause;
 use SQL::Functional::TableClause;
+use SQL::Functional::UpdateClause;
 use SQL::Functional::ValuesClause;
 use SQL::Functional::WhereClause;
 use Exporter;
@@ -47,6 +49,7 @@ our @EXPORT_OK = qw{
     FROM
     WHERE
     match
+    op
     table
     ORDER_BY
     DESC
@@ -57,6 +60,7 @@ our @EXPORT_OK = qw{
     INSERT
     INTO
     VALUES
+    UPDATE
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -130,6 +134,7 @@ sub match($$$)
     });
     return $clause;
 }
+*op = \&match;
 
 sub ORDER_BY($;@)
 {
@@ -213,6 +218,26 @@ sub VALUES ($)
     my ($values) = @_;
     my $clause = SQL::Functional::ValuesClause->new(
         params => $values,
+    );
+    return $clause;
+}
+
+sub UPDATE ($$$)
+{
+    my ($table, $set, $where) = @_;
+    my $clause = SQL::Functional::UpdateClause->new(
+        table => $table,
+        set => $set,
+        where => $where,
+    );
+    return ($clause->to_string, $clause->get_params);
+}
+
+sub SET
+{
+    my (@clauses) = @_;
+    my $clause = SQL::Functional::SetClause->new(
+        clauses => \@clauses,
     );
     return $clause;
 }
