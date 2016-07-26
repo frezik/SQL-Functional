@@ -1,2 +1,14 @@
-* Export to a specified namespace
+First Release
+=============
+* Dynamically create lists of WHERE matches, FROM tables, etc.
+* Make sure you can do an inner join with:
+  foo.id = bar.foo_id
+* Alias field names
+* VALUES can take a subselect
 * POD
+
+Future Versions
+===============
+* Custom SQL function calls: 
+    date_entered > to_date(?, 'MM/DD/YYYY')
+  With bind var "11/26/2008"
