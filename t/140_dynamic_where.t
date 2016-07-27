@@ -21,48 +21,24 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::AndClause;
-
+use Test::More tests => 2;
 use v5.14;
-use warnings;
-use Moose;
-use namespace::autoclean;
-use SQL::Functional::Clause;
+use SQL::Functional;
 
-with 'SQL::Functional::Clause';
-
-has clauses => (
-    traits => [ 'Array' ],
-    is => 'ro',
-    isa => 'ArrayRef[SQL::Functional::Clause]',
-    required => 1,
-    auto_deref => 1,
-    handles => {
-        add => 'push',
-    },
+my $and = AND(
+    match( 'bar', '>', 1 ),
 );
+$and->add( match( 'bar', '<', 5 ) );
 
-sub to_string
-{
-    my ($self) = @_;
-    my @clause_strs = map {
-        $_->to_string
-    } $self->clauses;
+my $or = OR(
+    match( 'foo', '<', 10 ),
+);
+$or->add( match( 'foo', '>', 15 ) );
+$and->add( $or );
 
-    my $str = '(' . join( ' AND ', @clause_strs ) . ')';
-    return $str;
-}
-
-sub get_params
-{
-    my ($self) = @_;
-    my @params = map { $_->get_params } $self->clauses;
-    return @params;
-}
-
-
-no Moose;
-__PACKAGE__->meta->make_immutable;
-1;
-__END__
-
+my ($sql, @sql_params) = SELECT star,
+    FROM( 'foo' ),
+    WHERE $and;
+cmp_ok( $sql, 'eq', 'SELECT * FROM foo WHERE (bar > ? AND bar < ? AND (foo < ? OR foo > ?))',
+    'Select statement with param' );
+is_deeply( \@sql_params, [1, 5, 10, 15], "Correct SQL params" );

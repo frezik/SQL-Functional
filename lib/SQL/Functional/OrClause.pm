@@ -32,10 +32,14 @@ use SQL::Functional::Clause;
 with 'SQL::Functional::Clause';
 
 has clauses => (
+    traits => [ 'Array' ],
     is => 'ro',
     isa => 'ArrayRef[SQL::Functional::Clause]',
     required => 1,
     auto_deref => 1,
+    handles => {
+        add => 'push',
+    },
 );
 
 sub to_string
