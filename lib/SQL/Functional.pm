@@ -40,6 +40,7 @@ use SQL::Functional::SubSelectClause;
 use SQL::Functional::TableClause;
 use SQL::Functional::UpdateClause;
 use SQL::Functional::ValuesClause;
+use SQL::Functional::VerbatimClause;
 use SQL::Functional::WhereClause;
 use Exporter;
 our @ISA = qw{ Exporter };
@@ -50,6 +51,7 @@ our @EXPORT_OK = qw{
     FROM
     WHERE
     match
+    match_verbatim
     op
     table
     ORDER_BY
@@ -139,6 +141,24 @@ sub match($$$)
     return $clause;
 }
 *op = \&match;
+
+sub match_verbatim($$$)
+{
+    my ($field, $op, $value) = @_;
+
+    my $clause_value = 
+        ref($value) && $value->does( 'SQL::Functional::Clause' )
+        ? $value
+        : SQL::Functional::VerbatimClause->new({
+            value => $value,
+        });
+    my $clause = SQL::Functional::MatchClause->new({
+        field => $field,
+        op => $op,
+        value => $clause_value,
+    });
+    return $clause;
+}
 
 sub ORDER_BY($;@)
 {
@@ -367,6 +387,17 @@ L<SQL::Functional::Clause> role, it will be added as-is.
 Alias for C<match>. The wording of C<match> tends to look better inside 
 C<SELECT ... WHERE ...> statements, while C<op> tends to be better inside 
 C<UPDATE ... SET ...> statements.
+
+=head3 match_verbatim
+
+Creates a L<SQL::Functional::MatchClause> and returns it. The difference 
+between this and C<match> is that the third argument is used directly, 
+rather than a placeholder. This is useful, for example, when you want to 
+do a join like:
+
+    WHERE foo.id = bar.foo_id
+
+Don't know what's wrong with C<INNER JOIN>, but some people prefer this syntax.
 
 =head3 table
 

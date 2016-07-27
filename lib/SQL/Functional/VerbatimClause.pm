@@ -21,23 +21,31 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 17;
-use v5.14;
+package SQL::Functional::VerbatimClause;
 
-use_ok( 'SQL::Functional::Clause' );
-use_ok( 'SQL::Functional::AndClause' );
-use_ok( 'SQL::Functional::FromClause' );
-use_ok( 'SQL::Functional::InnerJoinClause' );
-use_ok( 'SQL::Functional::InsertClause' );
-use_ok( 'SQL::Functional::MatchClause' );
-use_ok( 'SQL::Functional::OrClause' );
-use_ok( 'SQL::Functional::OrderByClause' );
-use_ok( 'SQL::Functional::PlaceholderClause' );
-use_ok( 'SQL::Functional::UpdateClause' );
-use_ok( 'SQL::Functional::ValuesClause' );
-use_ok( 'SQL::Functional::VerbatimClause' );
-use_ok( 'SQL::Functional::WhereClause' );
-use_ok( 'SQL::Functional::SelectClause' );
-use_ok( 'SQL::Functional::SetClause' );
-use_ok( 'SQL::Functional::SubSelectClause' );
-use_ok( 'SQL::Functional' );
+use v5.14;
+use warnings;
+use Moose;
+use namespace::autoclean;
+use SQL::Functional::Clause;
+
+with 'SQL::Functional::Clause';
+
+has value => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+);
+
+sub to_string
+{
+    my ($self) = @_;
+    return $self->value;
+}
+
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
+1;
+__END__
+

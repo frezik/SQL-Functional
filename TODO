@@ -1,9 +1,9 @@
 First Release
 =============
-* Make sure you can do an inner join with:
-  foo.id = bar.foo_id
 * Alias field names
 * VALUES can take a subselect
+* IS_NULL( 'field' )
+* GROUP_BY
 * POD
 
 Future Versions
@@ -11,3 +11,5 @@ Future Versions
 * Custom SQL function calls: 
     date_entered > to_date(?, 'MM/DD/YYYY')
   With bind var "11/26/2008"
+* Other join types (left, right, outer)
+* Subquery in FROM clause
