@@ -1,6 +1,5 @@
 First Release
 =============
-* Dynamically create lists of FROM tables
 * Make sure you can do an inner join with:
   foo.id = bar.foo_id
 * Alias field names

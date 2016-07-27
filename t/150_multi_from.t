@@ -21,52 +21,10 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::FromClause;
-
+use Test::More tests => 1;
 use v5.14;
-use warnings;
-use Moose;
-use namespace::autoclean;
-use SQL::Functional::Clause;
-use SQL::Functional::TableClause;
+use SQL::Functional;
 
-with 'SQL::Functional::Clause';
-
-has tables => (
-    traits => [ 'Array' ],
-    is => 'ro',
-    isa => 'ArrayRef[SQL::Functional::TableClause]',
-    auto_deref => 1,
-    required => 1,
-    handles => {
-        add => 'push',
-    },
-);
-
-
-around 'add' => sub {
-    my ($orig, $self, $val) = @_;
-
-    my $clean_val = $val;
-    if( (! ref($val)) || (! $val->isa( 'SQL::Functional::TableClause' )) ) {
-        $clean_val = SQL::Functional::TableClause->new({
-            name => $val,
-        });
-    }
-
-    return $self->$orig( $clean_val );
-};
-
-
-sub to_string
-{
-    my ($self) = @_;
-    return 'FROM ' . join( ', ', map { $_->to_string } $self->tables );
-}
-
-
-no Moose;
-__PACKAGE__->meta->make_immutable;
-1;
-__END__
-
+my ($sql, @sql_params) = SELECT star, FROM( 'foo', 'bar' );
+cmp_ok( $sql, 'eq', 'SELECT * FROM foo, bar',
+    'Select statement on multiple tables' );
