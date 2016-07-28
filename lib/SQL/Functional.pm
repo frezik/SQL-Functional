@@ -48,6 +48,8 @@ our @ISA = qw{ Exporter };
 our @EXPORT_OK = qw{
     SELECT
     star
+    field
+    col
     FROM
     WHERE
     match
@@ -75,8 +77,27 @@ our @EXPORT = @EXPORT_OK;
 sub SELECT ($$@)
 {
     my ($fields, @clauses) = @_;
+    my @fields;
+    if( ref $fields eq 'ARRAY' ) {
+        @fields = map {
+            (ref($_) && $_->isa( 'SQL::Functional::FieldClause' ))
+                ? $_
+                : SQL::Functional::FieldClause->new({
+                    name => $_,
+                });
+        } @$fields;
+    }
+    elsif( $fields->isa( 'SQL::Functional::FieldClause' ) ) {
+        @fields = ($fields);
+    }
+    else {
+        @fields = ( SQL::Functional::FieldClause->new({
+            name => $fields,
+        }) );
+    }
+
     my $clause = SQL::Functional::SelectClause->new(
-        fields => ref $fields ? $fields : [$fields],
+        fields => \@fields,
         clauses => \@clauses,
     );
     return ($clause->to_string, $clause->get_params);
@@ -84,8 +105,17 @@ sub SELECT ($$@)
 
 sub star ()
 {
-    return '*';
+    return field( '*' );
 }
+
+sub field ($)
+{
+    my ($name) = @_;
+    return SQL::Functional::FieldClause->new({
+        name => $name,
+    });
+}
+*col = \&field;
 
 sub table($)
 {
@@ -127,6 +157,11 @@ sub match($$$)
 {
     my ($field, $op, $value) = @_;
 
+    my $field_obj = ref($field)
+        ? $field
+        : SQL::Functional::FieldClause->new({
+            name => $field,
+        });
     my $clause_value = 
         ref($value) && $value->does( 'SQL::Functional::Clause' )
         ? $value
@@ -134,7 +169,7 @@ sub match($$$)
             value => $value,
         });
     my $clause = SQL::Functional::MatchClause->new({
-        field => $field,
+        field => $field_obj,
         op => $op,
         value => $clause_value,
     });
@@ -146,14 +181,20 @@ sub match_verbatim($$$)
 {
     my ($field, $op, $value) = @_;
 
+    my $field_obj = ref($field)
+        ? $field
+        : SQL::Functional::FieldClause->new({
+            name => $field,
+        });
     my $clause_value = 
         ref($value) && $value->does( 'SQL::Functional::Clause' )
         ? $value
         : SQL::Functional::VerbatimClause->new({
             value => $value,
         });
+
     my $clause = SQL::Functional::MatchClause->new({
-        field => $field,
+        field => $field_obj,
         op => $op,
         value => $clause_value,
     });
@@ -192,8 +233,27 @@ sub INNER_JOIN($$$)
 sub SUBSELECT($$@)
 {
     my ($fields, @clauses) = @_;
+    my @fields;
+    if( ref $fields eq 'ARRAY' ) {
+        @fields = map {
+            (ref($_) && $_->isa( 'SQL::Functional::FieldClause' ))
+                ? $_
+                : SQL::Functional::FieldClause->new({
+                    name => $_,
+                });
+        } @$fields;
+    }
+    elsif( $fields->isa( 'SQL::Functional::FieldClause' ) ) {
+        @fields = ($fields);
+    }
+    else {
+        @fields = ( SQL::Functional::FieldClause->new({
+            name => $fields,
+        }) );
+    }
+
     my $clause = SQL::Functional::SubSelectClause->new(
-        fields => ref $fields ? $fields : [$fields],
+        fields => \@fields,
         clauses => \@clauses,
     );
     return $clause;
@@ -346,6 +406,15 @@ their way to one of the top-level functions above.
 =head3 star
 
 A star, like the one you would use to say C<SELECT * FROM . . .>.
+
+=head3 field
+
+Creates a L<SQL::Functional::FieldClause> and returns it. You pass in the 
+name of a field, like the names of columns..
+
+=head3 col
+
+Alias for C<field()>.
 
 =head3 FROM
 

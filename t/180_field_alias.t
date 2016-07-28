@@ -21,56 +21,27 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::SelectClause;
-
+use Test::More tests => 2;
 use v5.14;
-use warnings;
-use Moose;
-use Moose::Util::TypeConstraints;
-use namespace::autoclean;
-use SQL::Functional::Clause;
-use SQL::Functional::FieldClause;
+use SQL::Functional;
 
-with 'SQL::Functional::Clause';
+my $foo_tbl = table 'foo';
+my $bar_tbl = table 'bar';
+$foo_tbl->as( 'f' );
+$bar_tbl->as( 'b' );
+my $qux_alias = $foo_tbl->field( 'qux' )->as( 'q1' );
 
-has fields => (
-    is => 'ro',
-    isa => 'ArrayRef[SQL::Functional::FieldClause]',
-    required => 1,
-    auto_deref => 1,
-);
-has clauses => (
-    is => 'ro',
-    isa => 'ArrayRef[SQL::Functional::Clause]',
-    required => 1,
-    auto_deref => 1,
-);
-
-
-sub to_string
-{
-    my ($self) = @_;
-    my @fields = $self->fields;
-    my @clauses = $self->clauses;
-
-    my @clause_strs = map { $_->to_string } @clauses;
-    my @field_strs  = map { $_->to_string } @fields;
-
-    my $str = 'SELECT ' . join( ', ', @field_strs )
-        . ' ' . join( ' ', @clause_strs );
-    return $str;
-}
-
-sub get_params
-{
-    my ($self) = @_;
-    my @params = map { $_->get_params } $self->clauses;
-    return @params;
-}
-
-
-no Moose;
-__PACKAGE__->meta->make_immutable;
-1;
-__END__
-
+my ($sql, @sql_params) = SELECT [
+        $qux_alias,
+        field( 'quux' )->as( 'q2' ),
+        col( 'quuuux' ),
+        $bar_tbl->field( 'quuux' )->as( 'q3' ),
+    ],
+    FROM( $foo_tbl ), 
+    INNER_JOIN(
+        $bar_tbl, $foo_tbl->field( 'id' ), $bar_tbl->field( 'foo_id' )
+    ),
+    WHERE match( $foo_tbl->field( 'baz' ), '=', 3 );
+cmp_ok( $sql, 'eq', 'SELECT f.qux AS q1, quux AS q2, quuuux, b.quuux AS q3 FROM foo AS f INNER JOIN bar AS b ON f.id = b.foo_id WHERE f.baz = ?',
+    'Field alias set' );
+is_deeply( \@sql_params, [3], "Correct SQL params" );

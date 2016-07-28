@@ -28,6 +28,7 @@ use warnings;
 use Moose;
 use namespace::autoclean;
 use SQL::Functional::Clause;
+use SQL::Functional::FieldClause;
 
 with 'SQL::Functional::Clause';
 
@@ -48,7 +49,13 @@ sub field
 {
     my ($self, $field) = @_;
     my $table_name = $self->as // $self->name;
-    return $table_name . '.' . $field;
+
+    my $field_str = $table_name . '.' . $field;
+    my $field_obj = SQL::Functional::FieldClause->new({
+        name => $field_str,
+    });
+
+    return $field_obj;
 }
 
 sub to_string

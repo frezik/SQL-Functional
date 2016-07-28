@@ -39,12 +39,12 @@ has table => (
 );
 has field1 => (
     is => 'ro',
-    isa => 'Str',
+    isa => 'SQL::Functional::FieldClause',
     required => 1,
 );
 has field2 => (
     is => 'ro',
-    isa => 'Str',
+    isa => 'SQL::Functional::FieldClause',
     required => 1,
 );
 
@@ -53,8 +53,8 @@ sub to_string
     my ($self) = @_;
     return 'INNER JOIN '
         . $self->table->to_string
-        . ' ON ' . $self->field1
-        . ' = ' . $self->field2;
+        . ' ON ' . $self->field1->to_string
+        . ' = ' . $self->field2->to_string;
 }
 
 

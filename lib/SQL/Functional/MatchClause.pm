@@ -33,7 +33,7 @@ with 'SQL::Functional::Clause';
 
 has field => (
     is => 'ro',
-    isa => 'Str',
+    isa => 'SQL::Functional::FieldClause',
     required => 1,
 );
 
@@ -52,7 +52,10 @@ has value => (
 sub to_string
 {
     my ($self) = @_;
-    return join ' ', $self->field, $self->op, $self->value->to_string;
+    return join ' ',
+        $self->field->to_string,
+        $self->op,
+        $self->value->to_string;
 }
 
 sub get_params

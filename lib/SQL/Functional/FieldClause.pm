@@ -21,51 +21,40 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::SelectClause;
+package SQL::Functional::FieldClause;
 
 use v5.14;
 use warnings;
 use Moose;
-use Moose::Util::TypeConstraints;
 use namespace::autoclean;
 use SQL::Functional::Clause;
-use SQL::Functional::FieldClause;
 
 with 'SQL::Functional::Clause';
 
-has fields => (
+has name => (
     is => 'ro',
-    isa => 'ArrayRef[SQL::Functional::FieldClause]',
+    isa => 'Str',
     required => 1,
-    auto_deref => 1,
 );
-has clauses => (
+has alias => (
     is => 'ro',
-    isa => 'ArrayRef[SQL::Functional::Clause]',
-    required => 1,
-    auto_deref => 1,
+    isa => 'Maybe[Str]',
+    writer => '_as',
 );
 
+
+sub as
+{
+    my ($self, $alias) = @_;
+    $self->_as( $alias );
+    return $self;
+}
 
 sub to_string
 {
     my ($self) = @_;
-    my @fields = $self->fields;
-    my @clauses = $self->clauses;
-
-    my @clause_strs = map { $_->to_string } @clauses;
-    my @field_strs  = map { $_->to_string } @fields;
-
-    my $str = 'SELECT ' . join( ', ', @field_strs )
-        . ' ' . join( ' ', @clause_strs );
-    return $str;
-}
-
-sub get_params
-{
-    my ($self) = @_;
-    my @params = map { $_->get_params } $self->clauses;
-    return @params;
+    my $alias = $self->alias;
+    return $self->name . (defined $alias ? ' AS ' . $alias : '');
 }
 
 

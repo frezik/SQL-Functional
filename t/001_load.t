@@ -21,11 +21,12 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 17;
+use Test::More tests => 18;
 use v5.14;
 
 use_ok( 'SQL::Functional::Clause' );
 use_ok( 'SQL::Functional::AndClause' );
+use_ok( 'SQL::Functional::FieldClause' );
 use_ok( 'SQL::Functional::FromClause' );
 use_ok( 'SQL::Functional::InnerJoinClause' );
 use_ok( 'SQL::Functional::InsertClause' );
