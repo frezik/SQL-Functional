@@ -27,7 +27,7 @@ use SQL::Functional;
 
 my ($sql, @sql_params) = SELECT star,
     FROM( 'foo' ),
-    WHERE match( 'bar', 'IN', SUBSELECT(
+    WHERE match( 'bar', 'IN', wrap SUBSELECT(
         ['id'],
         FROM( 'bar_tbl' ),
         WHERE match( 'baz', '>', 2 )

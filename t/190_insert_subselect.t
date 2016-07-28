@@ -21,26 +21,15 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::SubSelectClause;
-
+use Test::More tests => 2;
 use v5.14;
-use warnings;
-use Moose;
-use namespace::autoclean;
-use SQL::Functional::SelectClause;
+use SQL::Functional;
 
-extends 'SQL::Functional::SelectClause';
-
-
-sub to_string
-{
-    my ($self) = @_;
-    return '(' . $self->SUPER::to_string . ')';
-}
-
-
-no Moose;
-__PACKAGE__->meta->make_immutable;
-1;
-__END__
-
+my ($sql, @sql_params) = INSERT INTO 'foo',
+    [
+        'bar',
+    ],
+    SUBSELECT ['id'], FROM( 'baz' ), WHERE match( 'qux', '=', 1 );
+cmp_ok( $sql, 'eq', 'INSERT INTO foo (bar) SELECT id FROM baz WHERE qux = ?',
+    'Insert with subquery' );
+is_deeply( \@sql_params, [1], "Placeholder param set" );

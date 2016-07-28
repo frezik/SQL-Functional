@@ -36,12 +36,12 @@ use SQL::Functional::OrderByClause;
 use SQL::Functional::PlaceholderClause;
 use SQL::Functional::SelectClause;
 use SQL::Functional::SetClause;
-use SQL::Functional::SubSelectClause;
 use SQL::Functional::TableClause;
 use SQL::Functional::UpdateClause;
 use SQL::Functional::ValuesClause;
 use SQL::Functional::VerbatimClause;
 use SQL::Functional::WhereClause;
+use SQL::Functional::WrapClause;
 use Exporter;
 our @ISA = qw{ Exporter };
 
@@ -68,6 +68,7 @@ our @EXPORT_OK = qw{
     UPDATE
     SET
     DELETE
+    wrap
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -252,10 +253,10 @@ sub SUBSELECT($$@)
         }) );
     }
 
-    my $clause = SQL::Functional::SubSelectClause->new(
+    my $clause = SQL::Functional::SelectClause->new({
         fields => \@fields,
         clauses => \@clauses,
-    );
+    });
     return $clause;
 }
 
@@ -325,6 +326,15 @@ sub DELETE ($;$)
         where => $where,
     );
     return ($clause->to_string, $clause->get_params);
+}
+
+sub wrap ($)
+{
+    my ($clause) = @_;
+    my $wrap = SQL::Functional::WrapClause->new({
+        clause => $clause,
+    });
+    return $wrap;
 }
 
 
@@ -567,6 +577,33 @@ of values, which will become bind variables.
 Creates a L<SQL::Functional::SetClause> and returns it. Takes a list of 
 L<SQL::Functional::MatchClause> objects, which you can make with C<op> 
 (or C<match>).
+
+=head3 wrap
+
+Creates a L<SQL::Functional::WrapClause> and returns it. Takes a clause 
+as an argument.
+
+This is used when you need to wrap a portion of the SQL in parens. For 
+instance, subqueries in a C<SELECT> statement need this:
+
+  SELECT * FROM foo WHERE bar IN (SELECT id FROM bar);
+
+Which you could build like this:
+
+  SELECT star,
+      FROM( 'foo' ),
+      WHERE match( 'bar', 'IN', wrap(
+          SUBSELECT ['id'], FROM 'bar'
+      ));
+
+On the other hand, C<INSERT> statements with subqueries don't take parens:
+
+  INSERT INTO foo (bar) SELECT id from bar;
+
+In which case you I<don't> need to use C<wrap()>:
+
+  INSERT INTO 'foo', [ 'bar' ],
+      SUBSELECT ['id'], FROM( 'baz' ), WHERE match( 'qux', '=', 1 );
 
 =head1 WHY ANOTHER WAY TO WRITE SQL?
 

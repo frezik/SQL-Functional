@@ -46,7 +46,7 @@ has fields => (
 );
 has values => (
     is => 'ro',
-    isa => 'SQL::Functional::ValuesClause',
+    isa => 'SQL::Functional::Clause',
     required => 1,
 );
 

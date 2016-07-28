@@ -1,6 +1,5 @@
 First Release
 =============
-* VALUES can take a subselect
 * IS_NULL( 'field' )
 * GROUP_BY
 * POD
