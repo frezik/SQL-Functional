@@ -28,6 +28,7 @@ use warnings;
 use SQL::Functional::AndClause;
 use SQL::Functional::DeleteClause;
 use SQL::Functional::FromClause;
+use SQL::Functional::GroupByClause;
 use SQL::Functional::InnerJoinClause;
 use SQL::Functional::InsertClause;
 use SQL::Functional::MatchClause;
@@ -72,6 +73,7 @@ our @EXPORT_OK = qw{
     wrap
     IS_NULL
     IS_NOT_NULL
+    GROUP_BY
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -368,6 +370,21 @@ sub IS_NOT_NULL ($)
         field => $field_clause,
         not => 1,
     );
+    return $clause;
+}
+
+sub GROUP_BY ($)
+{
+    my ($field) = @_;
+    my $field_clause = ref $field
+        ? $field
+        : SQL::Functional::FieldClause->new({
+            name => $field,
+        });
+
+    my $clause = SQL::Functional::GroupByClause->new({
+        field => $field_clause,
+    });
     return $clause;
 }
 
