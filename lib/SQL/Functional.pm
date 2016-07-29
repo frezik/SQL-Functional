@@ -31,6 +31,7 @@ use SQL::Functional::FromClause;
 use SQL::Functional::InnerJoinClause;
 use SQL::Functional::InsertClause;
 use SQL::Functional::MatchClause;
+use SQL::Functional::NullClause;
 use SQL::Functional::OrClause;
 use SQL::Functional::OrderByClause;
 use SQL::Functional::PlaceholderClause;
@@ -69,6 +70,8 @@ our @EXPORT_OK = qw{
     SET
     DELETE
     wrap
+    IS_NULL
+    IS_NOT_NULL
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -335,6 +338,37 @@ sub wrap ($)
         clause => $clause,
     });
     return $wrap;
+}
+
+sub IS_NULL ($)
+{
+    my ($field) = @_;
+    my $field_clause = ref $field
+        ? $field
+        : SQL::Functional::FieldClause->new({
+            name => $field,
+        });
+
+    my $clause = SQL::Functional::NullClause->new({
+        field => $field_clause,
+    });
+    return $clause;
+}
+
+sub IS_NOT_NULL ($)
+{
+    my ($field) = @_;
+    my $field_clause = ref $field
+        ? $field
+        : SQL::Functional::FieldClause->new({
+            name => $field,
+        });
+
+    my $clause = SQL::Functional::NullClause->new(
+        field => $field_clause,
+        not => 1,
+    );
+    return $clause;
 }
 
 
@@ -604,6 +638,16 @@ In which case you I<don't> need to use C<wrap()>:
 
   INSERT INTO 'foo', [ 'bar' ],
       SUBSELECT ['id'], FROM( 'baz' ), WHERE match( 'qux', '=', 1 );
+
+=head3 IS_NULL
+
+Creates a L<SQL::Functional::NullClause> and returns it. Takes a field to 
+check as being null.
+
+=head3 IS_NOT_NULL
+
+Creates a L<SQL::Functional::NullClause> and returns it. Takes a field to 
+check as being not null.
 
 =head1 WHY ANOTHER WAY TO WRITE SQL?
 
