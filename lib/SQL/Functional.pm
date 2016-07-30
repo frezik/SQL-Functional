@@ -426,7 +426,7 @@ __END__
 
 =head1 DESCRIPTION
 
-TODO
+Builds SQL programmatically through a function-based interface.
 
 =head1 EXPORTED FUNCTIONS
 
@@ -665,6 +665,12 @@ check as being null.
 
 Creates a L<SQL::Functional::NullClause> and returns it. Takes a field to 
 check as being not null.
+
+=head1 WRITING EXTENSIONS
+
+C<SQL::Functional> can be easily extended for new SQL clauses using the
+L<SQL::Functional::Clause> Moose role. See the documentation on that 
+module to get started.
 
 =head1 WHY ANOTHER WAY TO WRITE SQL?
 

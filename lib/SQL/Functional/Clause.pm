@@ -46,3 +46,39 @@ sub get_params
 1;
 __END__
 
+
+=head1 NAME
+
+  SQL::Functional::Clause - Represents a portion of an SQL string
+
+=head1 DESCRIPTION
+
+A Moose role for representing SQL strings.
+
+=head1 PROVIDED ATTRIBUTES
+
+=head2 params
+
+Arrayref of strings. These represent the bind parameters of your clause. 
+Has C<auto_deref> set, so you can say:
+
+  my @params = $obj->params;
+
+Also see C<get_params()> for a method that can potentially fetch the params 
+of subclauses recursively.
+
+=head1 PROVIDED METHODS
+
+=head1 get_params
+
+By default, this returns the same thing as C<params>. However, since many 
+clauses will need to contain other clauses, overriding this allows for a 
+simple mechanism for recursively picking up the params of subclauses.
+
+=head1 REQUIRED METHODS
+
+=head2 to_string
+
+Returns the SQL string that represents this clause.
+
+=cut
