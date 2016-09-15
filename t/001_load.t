@@ -22,7 +22,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 use Test::More tests => 20;
-use v5.14;
+use strict;
+use warnings;
 
 use_ok( 'SQL::Functional::Clause' );
 use_ok( 'SQL::Functional::AndClause' );

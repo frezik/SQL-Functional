@@ -8,7 +8,5 @@
 * LIMIT
 * TRUNCATE
 * DISTINCT
-* Fix undeclared deps
 * Functional values:
   INSERT ... VALUES ( to_timestamp($myDateString, 'YYYY-MM-DD') )
-* Remove 5.14 dependency (5.10 minimum)

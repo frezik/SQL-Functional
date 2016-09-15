@@ -23,7 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 package SQL::Functional;
 
-use v5.14;
+use strict;
 use warnings;
 use SQL::Functional::AndClause;
 use SQL::Functional::DeleteClause;

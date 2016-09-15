@@ -23,7 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 package SQL::Functional::ValuesClause;
 
-use v5.14;
+use strict;
 use warnings;
 use Moose;
 use namespace::autoclean;
