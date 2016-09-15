@@ -1,1 +1,3 @@
 .build
+*.tar.gz
+SQL-Functional-*/
