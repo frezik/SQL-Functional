@@ -21,15 +21,13 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::SelectClause;
+package SQL::Functional::DistinctClause;
 
 use strict;
 use warnings;
 use Moose;
-use Moose::Util::TypeConstraints;
 use namespace::autoclean;
 use SQL::Functional::Clause;
-use SQL::Functional::FieldClause;
 
 with 'SQL::Functional::Clause';
 
@@ -39,40 +37,10 @@ has fields => (
     required => 1,
     auto_deref => 1,
 );
-has clauses => (
-    is => 'ro',
-    isa => 'ArrayRef[SQL::Functional::Clause]',
-    required => 1,
-    auto_deref => 1,
-);
-has is_distinct => (
-    is => 'ro',
-    isa => 'Bool',
-    default => 0,
-);
-
 
 sub to_string
 {
-    my ($self) = @_;
-    my @fields = $self->fields;
-    my @clauses = $self->clauses;
-
-    my @clause_strs = map { $_->to_string } @clauses;
-    my @field_strs  = map { $_->to_string } @fields;
-
-    my $str = 'SELECT '
-        . ($self->is_distinct ? 'DISTINCT ' : '')
-        . join( ', ', @field_strs )
-        . ' ' . join( ' ', @clause_strs );
-    return $str;
-}
-
-sub get_params
-{
-    my ($self) = @_;
-    my @params = map { $_->get_params } $self->clauses;
-    return @params;
+    return ''; # DISTINCT is effectively handled in SELECT
 }
 
 

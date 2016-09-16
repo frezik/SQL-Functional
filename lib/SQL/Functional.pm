@@ -27,6 +27,7 @@ use strict;
 use warnings;
 use SQL::Functional::AndClause;
 use SQL::Functional::DeleteClause;
+use SQL::Functional::DistinctClause;
 use SQL::Functional::FromClause;
 use SQL::Functional::GroupByClause;
 use SQL::Functional::InnerJoinClause;
@@ -78,6 +79,7 @@ our @EXPORT_OK = qw{
     GROUP_BY
     LIMIT
     TRUNCATE
+    DISTINCT
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -88,6 +90,8 @@ sub SELECT ($$@)
 {
     my ($fields, @clauses) = @_;
     my @fields;
+    my $is_distinct = 0;
+
     if( ref $fields eq 'ARRAY' ) {
         @fields = map {
             (ref($_) && $_->isa( 'SQL::Functional::FieldClause' ))
@@ -100,6 +104,10 @@ sub SELECT ($$@)
     elsif( $fields->isa( 'SQL::Functional::FieldClause' ) ) {
         @fields = ($fields);
     }
+    elsif( $fields->isa( 'SQL::Functional::DistinctClause' ) ) {
+        @fields = ($fields->fields);
+        $is_distinct = 1;
+    }
     else {
         @fields = ( SQL::Functional::FieldClause->new({
             name => $fields,
@@ -109,6 +117,7 @@ sub SELECT ($$@)
     my $clause = SQL::Functional::SelectClause->new(
         fields => \@fields,
         clauses => \@clauses,
+        is_distinct => $is_distinct,
     );
     return ($clause->to_string, $clause->get_params);
 }
@@ -408,6 +417,35 @@ sub TRUNCATE($)
         table => $table,
     });
     return ($trunc->to_string, $trunc->get_params);
+}
+
+sub DISTINCT ($)
+{
+    my ($fields) = @_;
+    my @fields;
+
+    if( ref $fields eq 'ARRAY' ) {
+        @fields = map {
+            (ref($_) && $_->isa( 'SQL::Functional::FieldClause' ))
+                ? $_
+                : SQL::Functional::FieldClause->new({
+                    name => $_,
+                });
+        } @$fields;
+    }
+    elsif( $fields->isa( 'SQL::Functional::FieldClause' ) ) {
+        @fields = ($fields);
+    }
+    else {
+        @fields = ( SQL::Functional::FieldClause->new({
+            name => $fields,
+        }) );
+    }
+
+    my $clause = SQL::Functional::DistinctClause->new({
+        fields => \@fields,
+    });
+    return $clause;
 }
 
 
