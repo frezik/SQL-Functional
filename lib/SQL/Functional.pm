@@ -40,6 +40,7 @@ use SQL::Functional::PlaceholderClause;
 use SQL::Functional::SelectClause;
 use SQL::Functional::SetClause;
 use SQL::Functional::TableClause;
+use SQL::Functional::TruncateClause;
 use SQL::Functional::UpdateClause;
 use SQL::Functional::ValuesClause;
 use SQL::Functional::VerbatimClause;
@@ -76,6 +77,7 @@ our @EXPORT_OK = qw{
     IS_NOT_NULL
     GROUP_BY
     LIMIT
+    TRUNCATE
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -399,6 +401,15 @@ sub LIMIT ($)
     return $limit;
 }
 
+sub TRUNCATE($)
+{
+    my ($table) = @_;
+    my $trunc = SQL::Functional::TruncateClause->new({
+        table => $table,
+    });
+    return ($trunc->to_string, $trunc->get_params);
+}
+
 
 1;
 __END__
@@ -681,6 +692,11 @@ check as being not null.
 
 Creates a L<SQL::Functional::LimitClause> and returns it.  Takes a number 
 that limits the number of rows returned.
+
+=head3 TRUNCATE
+
+Creates a L<SQL::Functional::TruncateClause> and returns it.  Takes a 
+table name.
 
 =head1 WRITING EXTENSIONS
 
