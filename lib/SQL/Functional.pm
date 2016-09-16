@@ -31,6 +31,7 @@ use SQL::Functional::FromClause;
 use SQL::Functional::GroupByClause;
 use SQL::Functional::InnerJoinClause;
 use SQL::Functional::InsertClause;
+use SQL::Functional::LimitClause;
 use SQL::Functional::MatchClause;
 use SQL::Functional::NullClause;
 use SQL::Functional::OrClause;
@@ -74,6 +75,7 @@ our @EXPORT_OK = qw{
     IS_NULL
     IS_NOT_NULL
     GROUP_BY
+    LIMIT
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -388,6 +390,15 @@ sub GROUP_BY ($)
     return $clause;
 }
 
+sub LIMIT ($)
+{
+    my ($num) = @_;
+    my $limit = SQL::Functional::LimitClause->new({
+        num => $num,
+    });
+    return $limit;
+}
+
 
 1;
 __END__
@@ -665,6 +676,11 @@ check as being null.
 
 Creates a L<SQL::Functional::NullClause> and returns it. Takes a field to 
 check as being not null.
+
+=head3 LIMIT
+
+Creates a L<SQL::Functional::LimitClause> and returns it.  Takes a number 
+that limits the number of rows returned.
 
 =head1 WRITING EXTENSIONS
 
