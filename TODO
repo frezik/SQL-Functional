@@ -4,6 +4,5 @@
     date_entered > to_date(?, 'MM/DD/YYYY')
   With bind var "11/26/2008"
 * Other join types (left, right, outer)
-* Subquery in FROM clause
 * Functional values:
   INSERT ... VALUES ( to_timestamp($myDateString, 'YYYY-MM-DD') )

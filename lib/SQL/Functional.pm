@@ -150,7 +150,15 @@ sub FROM (@)
 {
     my (@tables) = @_;
     my @table_objs = map {
-        ref $_ ? $_ : table $_
+        my $result;
+        if( ref $_ ) {
+            $result = $_;
+        }
+        else {
+            $result = table $_;
+        }
+
+        $result;
     } @tables;
 
     my $clause = SQL::Functional::FromClause->new({

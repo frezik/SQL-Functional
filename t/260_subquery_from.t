@@ -21,60 +21,11 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::WrapClause;
-
+use Test::More tests => 1;
 use strict;
 use warnings;
-use Moose;
-use namespace::autoclean;
-use SQL::Functional::Clause;
+use SQL::Functional;
 
-with 'SQL::Functional::Clause';
-
-has 'clause' => (
-    is => 'ro',
-    isa => 'SQL::Functional::Clause',
-    required => 1,
-);
-has as => (
-    is => 'rw',
-    isa => 'Maybe[Str]',
-    default => undef,
-);
-
-
-sub field
-{
-    my ($self, $field) = @_;
-    my $table_name = $self->as // $self->name;
-
-    my $field_str = $table_name . '.' . $field;
-    my $field_obj = SQL::Functional::FieldClause->new({
-        name => $field_str,
-    });
-
-    return $field_obj;
-}
-
-sub to_string
-{
-    my ($self) = @_;
-    my $as = $self->as;
-
-    my $str = '(' . $self->clause->to_string . ')';
-    $str .= ' AS ' . $as if defined $as;
-    return $str;
-}
-
-sub get_params
-{
-    my ($self) = @_;
-    return $self->clause->get_params;
-}
-
-
-no Moose;
-__PACKAGE__->meta->make_immutable;
-1;
-__END__
-
+my ($sql, @sql_params) = SELECT star, FROM wrap SUBSELECT( star, FROM 'foo' );
+cmp_ok( $sql, 'eq', 'SELECT * FROM (SELECT * FROM foo)',
+    'Subquery in FROM' );

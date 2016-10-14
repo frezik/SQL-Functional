@@ -35,7 +35,7 @@ with 'SQL::Functional::Clause';
 has tables => (
     traits => [ 'Array' ],
     is => 'ro',
-    isa => 'ArrayRef[SQL::Functional::TableClause]',
+    isa => 'ArrayRef[SQL::Functional::Clause]',
     auto_deref => 1,
     required => 1,
     handles => {
