@@ -29,6 +29,7 @@ use SQL::Functional::AndClause;
 use SQL::Functional::DeleteClause;
 use SQL::Functional::DistinctClause;
 use SQL::Functional::FromClause;
+use SQL::Functional::FunctionClause;
 use SQL::Functional::GroupByClause;
 use SQL::Functional::InnerJoinClause;
 use SQL::Functional::InsertClause;
@@ -80,6 +81,7 @@ our @EXPORT_OK = qw{
     LIMIT
     TRUNCATE
     DISTINCT
+    func
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -453,6 +455,18 @@ sub DISTINCT ($)
     my $clause = SQL::Functional::DistinctClause->new({
         fields => \@fields,
     });
+    return $clause;
+}
+
+sub func ($;@)
+{
+    my ($func_name, @args) = @_;
+
+    my $clause = SQL::Functional::FunctionClause->new({
+        name => $func_name,
+        args => \@args,
+    });
+
     return $clause;
 }
 

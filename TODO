@@ -1,8 +1,5 @@
 0.2 Release
 ===========
-* Custom SQL function calls: 
-    date_entered > to_date(?, 'MM/DD/YYYY')
-  With bind var "11/26/2008"
 * Other join types (left, right, outer)
 * Functional values:
   INSERT ... VALUES ( to_timestamp($myDateString, 'YYYY-MM-DD') )
