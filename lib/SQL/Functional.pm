@@ -34,6 +34,7 @@ use SQL::Functional::GroupByClause;
 use SQL::Functional::InnerJoinClause;
 use SQL::Functional::InsertClause;
 use SQL::Functional::LimitClause;
+use SQL::Functional::LiteralClause;
 use SQL::Functional::MatchClause;
 use SQL::Functional::NullClause;
 use SQL::Functional::OrClause;
@@ -82,6 +83,7 @@ our @EXPORT_OK = qw{
     TRUNCATE
     DISTINCT
     func
+    literal
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -470,6 +472,15 @@ sub func ($;@)
     return $clause;
 }
 
+sub literal ($)
+{
+    my ($str) = @_;
+    my $clause = SQL::Functional::LiteralClause->new({
+        literal => $str,
+    });
+    return $clause;
+}
+
 
 1;
 __END__
@@ -755,8 +766,26 @@ that limits the number of rows returned.
 
 =head3 TRUNCATE
 
-Creates a L<SQL::Functional::TruncateClause> and returns it.  Takes a 
-table name.
+Creates a L<SQL::Functional::TruncateClause> and returns it.  Takes a table 
+name.
+
+=head3 DISTINCT
+
+Creates a L<SQL::Functional::DistinictClause> and returns it.  Takes a list of 
+fields, which will be listed as C<DISTINCT> rows in the SQL.
+
+=head3 func
+
+Creates a L<SQL::Functional::FunctionClause> and returns it.  Takes a 
+function name, followed by any parameters.
+
+=head3 literal
+
+Not yet implemented.
+
+When it is, it will create a L<SQL::Functional::LiteralClause> and returns it. 
+Takes a string which will be put literally into the final SQL, rather than as a 
+placeholder.
 
 =head1 WRITING EXTENSIONS
 

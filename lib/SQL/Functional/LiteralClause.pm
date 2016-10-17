@@ -21,32 +21,31 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 25;
+package SQL::Functional::LiteralClause;
+
 use strict;
 use warnings;
+use Moose;
+use namespace::autoclean;
+use SQL::Functional::Clause;
 
-use_ok( 'SQL::Functional::Clause' );
-use_ok( 'SQL::Functional::AndClause' );
-use_ok( 'SQL::Functional::DistinctClause' );
-use_ok( 'SQL::Functional::TruncateClause' );
-use_ok( 'SQL::Functional::FieldClause' );
-use_ok( 'SQL::Functional::FromClause' );
-use_ok( 'SQL::Functional::GroupByClause' );
-use_ok( 'SQL::Functional::InnerJoinClause' );
-use_ok( 'SQL::Functional::InsertClause' );
-use_ok( 'SQL::Functional::LimitClause' );
-use_ok( 'SQL::Functional::LiteralClause' );
-use_ok( 'SQL::Functional::MatchClause' );
-use_ok( 'SQL::Functional::NullClause' );
-use_ok( 'SQL::Functional::OrClause' );
-use_ok( 'SQL::Functional::OrderByClause' );
-use_ok( 'SQL::Functional::PlaceholderClause' );
-use_ok( 'SQL::Functional::UpdateClause' );
-use_ok( 'SQL::Functional::ValuesClause' );
-use_ok( 'SQL::Functional::VerbatimClause' );
-use_ok( 'SQL::Functional::WhereClause' );
-use_ok( 'SQL::Functional::WrapClause' );
-use_ok( 'SQL::Functional::TruncateClause' );
-use_ok( 'SQL::Functional::SelectClause' );
-use_ok( 'SQL::Functional::SetClause' );
-use_ok( 'SQL::Functional' );
+with 'SQL::Functional::Clause';
+
+has literal => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+);
+
+sub to_string
+{
+    my ($self) = @_;
+    return $self->literal;
+}
+
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
+1;
+__END__
+
