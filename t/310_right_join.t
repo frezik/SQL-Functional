@@ -21,45 +21,24 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-package SQL::Functional::InnerJoinClause;
-
+use Test::More tests => 2;
 use strict;
 use warnings;
-use Moose;
-use namespace::autoclean;
-use SQL::Functional::Clause;
-use SQL::Functional::TableClause;
+use SQL::Functional;
 
-with 'SQL::Functional::Clause';
+my $foo_tbl = table 'foo';
+my $bar_tbl = table 'bar';
 
-has table => (
-    is => 'ro',
-    isa => 'SQL::Functional::TableClause',
-    required => 1,
-);
-has field1 => (
-    is => 'ro',
-    isa => 'SQL::Functional::FieldClause',
-    required => 1,
-);
-has field2 => (
-    is => 'ro',
-    isa => 'SQL::Functional::FieldClause',
-    required => 1,
-);
-
-sub to_string
-{
-    my ($self) = @_;
-    return 'INNER JOIN '
-        . $self->table->to_string
-        . ' ON ' . $self->field1->to_string
-        . ' = ' . $self->field2->to_string;
-}
-
-
-no Moose;
-__PACKAGE__->meta->make_immutable;
-1;
-__END__
-
+my ($sql, @sql_params) = SELECT [
+        $foo_tbl->field( 'qux' ),
+        $foo_tbl->field( 'quux' ),
+        $bar_tbl->field( 'quuux' ),
+    ],
+    FROM( $foo_tbl ), 
+    RIGHT_JOIN(
+        $bar_tbl, $foo_tbl->field( 'id' ), $bar_tbl->field( 'foo_id' )
+    ),
+    WHERE match( $foo_tbl->field( 'baz' ), '=', 1 );
+cmp_ok( $sql, 'eq', 'SELECT foo.qux, foo.quux, bar.quuux FROM foo RIGHT JOIN bar ON foo.id = bar.foo_id WHERE foo.baz = ?',
+    'Right join' );
+is_deeply( \@sql_params, [1], "Correct SQL params" );

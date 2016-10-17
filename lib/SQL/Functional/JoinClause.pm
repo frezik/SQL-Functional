@@ -21,32 +21,59 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 25;
+package SQL::Functional::JoinClause;
+
 use strict;
 use warnings;
+use Moose;
+use Moose::Util::TypeConstraints 'enum';
+use namespace::autoclean;
+use SQL::Functional::Clause;
+use SQL::Functional::TableClause;
 
-use_ok( 'SQL::Functional::Clause' );
-use_ok( 'SQL::Functional::AndClause' );
-use_ok( 'SQL::Functional::DistinctClause' );
-use_ok( 'SQL::Functional::TruncateClause' );
-use_ok( 'SQL::Functional::FieldClause' );
-use_ok( 'SQL::Functional::FromClause' );
-use_ok( 'SQL::Functional::GroupByClause' );
-use_ok( 'SQL::Functional::InsertClause' );
-use_ok( 'SQL::Functional::JoinClause' );
-use_ok( 'SQL::Functional::LimitClause' );
-use_ok( 'SQL::Functional::LiteralClause' );
-use_ok( 'SQL::Functional::MatchClause' );
-use_ok( 'SQL::Functional::NullClause' );
-use_ok( 'SQL::Functional::OrClause' );
-use_ok( 'SQL::Functional::OrderByClause' );
-use_ok( 'SQL::Functional::PlaceholderClause' );
-use_ok( 'SQL::Functional::UpdateClause' );
-use_ok( 'SQL::Functional::ValuesClause' );
-use_ok( 'SQL::Functional::VerbatimClause' );
-use_ok( 'SQL::Functional::WhereClause' );
-use_ok( 'SQL::Functional::WrapClause' );
-use_ok( 'SQL::Functional::TruncateClause' );
-use_ok( 'SQL::Functional::SelectClause' );
-use_ok( 'SQL::Functional::SetClause' );
-use_ok( 'SQL::Functional' );
+with 'SQL::Functional::Clause';
+
+enum 'POSSIBLE_TYPES', [qw{ inner left right full }];
+
+has table => (
+    is => 'ro',
+    isa => 'SQL::Functional::TableClause',
+    required => 1,
+);
+has field1 => (
+    is => 'ro',
+    isa => 'SQL::Functional::FieldClause',
+    required => 1,
+);
+has field2 => (
+    is => 'ro',
+    isa => 'SQL::Functional::FieldClause',
+    required => 1,
+);
+has type => (
+    is => 'ro',
+    isa => 'POSSIBLE_TYPES',
+    default => 'inner',
+);
+
+sub to_string
+{
+    my ($self) = @_;
+    my $type_str =
+        $self->type eq 'inner' ? 'INNER JOIN' :
+        $self->type eq 'left'  ? 'LEFT JOIN' :
+        $self->type eq 'right' ? 'RIGHT JOIN' :
+        $self->type eq 'full'  ? 'FULL JOIN' :
+        'INNER JOIN'; # Don't know what it is, so just have it default
+    return $type_str . ' '
+        . $self->table->to_string
+        . ' ON ' . $self->field1->to_string
+        . ' = ' . $self->field2->to_string;
+}
+
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
+1;
+__END__
+

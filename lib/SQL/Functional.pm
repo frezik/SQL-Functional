@@ -31,8 +31,8 @@ use SQL::Functional::DistinctClause;
 use SQL::Functional::FromClause;
 use SQL::Functional::FunctionClause;
 use SQL::Functional::GroupByClause;
-use SQL::Functional::InnerJoinClause;
 use SQL::Functional::InsertClause;
+use SQL::Functional::JoinClause;
 use SQL::Functional::LimitClause;
 use SQL::Functional::LiteralClause;
 use SQL::Functional::MatchClause;
@@ -66,6 +66,14 @@ our @EXPORT_OK = qw{
     ORDER_BY
     DESC
     INNER_JOIN
+    JOIN
+    LEFT_JOIN
+    LEFT_OUTER_JOIN
+    RIGHT_JOIN
+    RIGHT_OUTER_JOIN
+    FULL_JOIN
+    FULL_OUTER_JOIN
+    OUTER_JOIN
     SUBSELECT
     AND
     OR
@@ -253,13 +261,56 @@ sub DESC($)
 sub INNER_JOIN($$$)
 {
     my ($table, $field1, $field2) = @_;
-    my $clause = SQL::Functional::InnerJoinClause->new(
+    my $clause = SQL::Functional::JoinClause->new(
         table => $table,
         field1 => $field1,
         field2 => $field2,
+        type => 'inner',
     );
     return $clause;
 }
+
+sub LEFT_JOIN($$$)
+{
+    my ($table, $field1, $field2) = @_;
+    my $clause = SQL::Functional::JoinClause->new(
+        table => $table,
+        field1 => $field1,
+        field2 => $field2,
+        type => 'left',
+    );
+    return $clause;
+}
+
+sub RIGHT_JOIN($$$)
+{
+    my ($table, $field1, $field2) = @_;
+    my $clause = SQL::Functional::JoinClause->new(
+        table => $table,
+        field1 => $field1,
+        field2 => $field2,
+        type => 'right',
+    );
+    return $clause;
+}
+
+sub FULL_JOIN($$$)
+{
+    my ($table, $field1, $field2) = @_;
+    my $clause = SQL::Functional::JoinClause->new(
+        table => $table,
+        field1 => $field1,
+        field2 => $field2,
+        type => 'full',
+    );
+    return $clause;
+}
+
+*JOIN = \&INNER_JOIN;
+*LEFT_OUTER_JOIN = \&LEFT_JOIN;
+*RIGHT_OUTER_JOIN = \&RIGHT_JOIN;
+*FULL_OUTER_JOIN = \&FULL_JOIN;
+*OUTER_JOIN = \&FULL_JOIN;
 
 sub SUBSELECT($$@)
 {
@@ -667,11 +718,57 @@ Used with C<ORDER_BY> to set a field to sort in decending order.
 
   INNER_JOIN( $table, $field1, $field2 );
 
-Creates a L<SQL::Functional::InnerJoinClause> and returns it. The first 
-argument, (C<$table>), is an C<SQL::Functional::TableClause> object, which 
-is the table being joined. The second argument is the field on the main 
-table that will be checked. The third argument is the field on the joined 
-table.
+Creates a L<SQL::Functional::JoinClause> with C<join_type = 'inner'> and 
+returns it. The first argument, (C<$table>), is an 
+C<SQL::Functional::TableClause> object, which is the table being joined. The 
+second argument is the field on the main table that will be checked. The third 
+argument is the field on the joined table.
+
+=head3 JOIN
+
+Alias for C<INNER_JOIN>.
+
+=head3 LEFT_JOIN
+
+  LEFT_JOIN( $table, $field1, $field2 );
+
+Creates a L<SQL::Functional::JoinClause> with C<join_type = 'left'> and 
+returns it. The first argument, (C<$table>), is an 
+C<SQL::Functional::TableClause> object, which is the table being joined. The 
+second argument is the field on the main table that will be checked. The third 
+argument is the field on the joined table.
+
+=head3 LEFT_OUTER_JOIN
+
+Alias for C<LEFT_JOIN>.
+
+=head3 RIGHT_JOIN
+
+  RIGHT_JOIN( $table, $field1, $field2 );
+
+Creates a L<SQL::Functional::JoinClause> with C<join_type = 'right'> and 
+returns it. The first argument, (C<$table>), is an 
+C<SQL::Functional::TableClause> object, which is the table being joined. The 
+second argument is the field on the main table that will be checked. The third 
+argument is the field on the joined table.
+
+=head3 RIGHT_OUTER_JOIN
+
+Alias for C<RIGHT_JOIN>.
+
+=head3 FULL_JOIN
+
+  FULL_JOIN( $table, $field1, $field2 );
+
+Creates a L<SQL::Functional::JoinClause> with C<join_type = 'full'> and 
+returns it. The first argument, (C<$table>), is an 
+C<SQL::Functional::TableClause> object, which is the table being joined. The 
+second argument is the field on the main table that will be checked. The third 
+argument is the field on the joined table.
+
+=head3 FULL_OUTER_JOIN
+
+Alias for C<FULL_JOIN>.
 
 =head3 SUBSELECT
 
