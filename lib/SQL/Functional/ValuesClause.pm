@@ -31,12 +31,28 @@ use SQL::Functional::Clause;
 
 with 'SQL::Functional::Clause';
 
+has 'clauses' => (
+    is => 'ro',
+    isa => 'SQL::Functional::Type::Clauses',
+    coerce => 1,
+);
 
 sub to_string
 {
     my ($self) = @_;
-    my @params = $self->params;
-    return 'VALUES (' . join( ', ', ('?') x scalar(@params) ) . ')';
+    my @params = @{ $self->clauses };
+    return 'VALUES (' . join( ', ', map {
+        $_->to_string
+    } @params ) . ')';
+}
+
+sub get_params
+{
+    my ($self) = @_;
+    my @params = map {
+        $_->get_params;
+    } @{ $self->clauses };
+    return @params;
 }
 
 

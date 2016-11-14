@@ -26,6 +26,41 @@ package SQL::Functional::Clause;
 use strict;
 use warnings;
 use Moose::Role;
+use Moose::Util::TypeConstraints;
+
+
+subtype 'SQL::Functional::Type::Literals',
+    as 'ArrayRef[SQL::Functional::LiteralClause]';
+coerce 'SQL::Functional::Type::Literals',
+    from 'ArrayRef[Str|SQL::Functional::LiteralClause]',
+    via {
+        my @args = @$_;
+        my @new_args = map {
+            ref $_
+                ? $_
+                : SQL::Functional::PlaceholderClause->new({
+                    literal => $_,
+                });
+        } @args;
+        return \@new_args;
+    };
+
+subtype 'SQL::Functional::Type::Clauses',
+    as 'ArrayRef[SQL::Functional::Clause]';
+coerce 'SQL::Functional::Type::Clauses',
+    from 'ArrayRef[Str|SQL::Functional::Clause]',
+    via {
+        my @args = @$_;
+        my @new_args = map {
+            ref $_
+                ? $_
+                : SQL::Functional::PlaceholderClause->new({
+                    literal => $_,
+                });
+        } @args;
+        return \@new_args;
+    };
+
 
 has params => (
     is => 'ro',

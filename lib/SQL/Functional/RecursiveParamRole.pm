@@ -21,20 +21,25 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More 
-    tests => 2;
+package SQL::Functional::RecursiveParamRole;
+
 use strict;
 use warnings;
-use SQL::Functional;
+use Moose::Role;
 
-my ($sql, @sql_params) = INSERT INTO 'foo',
-    [
-        'bar',
-    ],
-    VALUES [
-        func( 'to_timestamp', literal '$myDateString', 'YYYY-MM-DD' ),
-    ];
-cmp_ok( $sql, 'eq', 'INSERT INTO foo (bar) VALUES'  
-    . ' (to_timestamp($myDateString,?))',
-    'Basic insert statement' );
-is_deeply( \@sql_params, ['YYYY-MM-DD'], "Placeholder param set" );
+
+requires 'params';
+
+
+sub get_param
+{
+    my ($self) = @_;
+    my @params = map {
+        $_->get_params
+    } $self->params;
+    return @params;
+}
+
+
+1;
+__END__

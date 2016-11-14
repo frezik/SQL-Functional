@@ -39,9 +39,10 @@ has name => (
 );
 has args => (
     is => 'ro',
-    isa => 'ArrayRef[Str]',
+    isa => 'SQL::Functional::Type::Literals',
     required => 1,
     auto_deref => 1,
+    coerce => 1,
 );
 
 
@@ -51,14 +52,18 @@ sub to_string
     my $name = $self->name;
     my @args = $self->args;
     
-    my $sql = $name . '(' . join( ',', ('?') x scalar @args ) . ')';
+    my $sql = $name . '(' . join( ',', map {
+        $_->to_string
+    } @args ) . ')';
     return $sql;
 }
 
 sub get_params
 {
     my ($self) = @_;
-    return $self->args;
+    my @args = $self->args;
+    my @params = map { $_->get_params } @args;
+    return @params;
 }
 
 

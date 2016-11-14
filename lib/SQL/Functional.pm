@@ -205,7 +205,7 @@ sub match($$$)
         ref($value) && $value->does( 'SQL::Functional::Clause' )
         ? $value
         : SQL::Functional::PlaceholderClause->new({
-            value => $value,
+            literal => $value,
         });
     my $clause = SQL::Functional::MatchClause->new({
         field => $field_obj,
@@ -374,7 +374,7 @@ sub VALUES ($)
 {
     my ($values) = @_;
     my $clause = SQL::Functional::ValuesClause->new(
-        params => $values,
+        clauses => $values,
     );
     return $clause;
 }

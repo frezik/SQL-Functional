@@ -29,21 +29,15 @@ use Moose;
 use namespace::autoclean;
 use SQL::Functional::Clause;
 
-with 'SQL::Functional::Clause';
+extends 'SQL::Functional::LiteralClause';
 
-
-has value => (
-    is => 'ro',
-    isa => 'Str',
-    required => 1,
-);
 
 sub to_string { '?' }
 
 sub get_params
 {
     my ($self) = @_;
-    return $self->value;
+    return ($self->literal);
 }
 
 
