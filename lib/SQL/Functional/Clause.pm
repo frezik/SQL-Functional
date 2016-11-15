@@ -64,17 +64,21 @@ coerce 'SQL::Functional::Type::Clauses',
 
 has params => (
     is => 'ro',
-    isa => 'ArrayRef[Str]',
+    isa => 'SQL::Functional::Type::Clauses',
     default => sub {[]},
     auto_deref => 1,
 );
 
 requires 'to_string';
 
+
 sub get_params
 {
     my ($self) = @_;
-    return $self->params;
+    my @params = map {
+        $_->get_params
+    } $self->params;
+    return @params;
 }
 
 
