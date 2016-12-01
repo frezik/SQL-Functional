@@ -1,5 +1,10 @@
 Revision history for perl module SQL::Functional
 
+0.3 2016-12-01
+
+- Implement string literal clauses
+- ::Clause->get_params() recurses into subclauses by default
+
 0.2 2016-10-17
 
 - Remove v5.14 dependency

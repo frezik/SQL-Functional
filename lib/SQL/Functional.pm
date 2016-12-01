@@ -878,11 +878,9 @@ function name, followed by any parameters.
 
 =head3 literal
 
-Not yet implemented.
-
-When it is, it will create a L<SQL::Functional::LiteralClause> and returns it. 
-Takes a string which will be put literally into the final SQL, rather than as a 
-placeholder.
+Creates a L<SQL::Functional::LiteralClause> and returns it. 
+Takes a string which will be put literally into the final SQL, rather than as 
+a placeholder.
 
 =head1 WRITING EXTENSIONS
 
@@ -895,9 +893,9 @@ module to get started.
 I should preface this section by saying that I'm not trying to insult the 
 developers of C<SQL::Abstract> or C<DBIx::Class>. They've obviously worked 
 hard to create successful and widely used libraries for a very common task. 
-Perl is better for what they've accomplished.  That said, I think they're stuck 
-in an object-oriented way of thinking in a problem space that could be expressed
-more naturally with functions.
+Perl is better for what they've accomplished.  That said, I think they're 
+stuck in an object-oriented way of thinking in a problem space that could be 
+expressed more naturally with functions.
 
 Existing ways of making database calls fall into one of three approaches: 
 direct string manipulation by hand, an object interface that outputs SQL 

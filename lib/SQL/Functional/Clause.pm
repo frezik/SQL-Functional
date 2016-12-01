@@ -94,12 +94,24 @@ __END__
 
 A Moose role for representing SQL strings.
 
+=head1 PROVIDED MOOSE TYPES
+
+=head2 SQL::Functional::Type::Literals
+
+An array ref of C<SQL::Functional::LiteralClause> objects.  It will 
+automatically coerce any strings in the array to C<PlacheolderClause>s.
+
+=head2 SQL::Functional::Type::Clauses
+
+An array ref of C<SQL::Functional::Clause> objects. It will automatically 
+coerce any strings in the array to C<PlaceholderClause>s.
+
 =head1 PROVIDED ATTRIBUTES
 
 =head2 params
 
-Arrayref of strings. These represent the bind parameters of your clause. 
-Has C<auto_deref> set, so you can say:
+Type C<SQL::Functional::Type::Clauses>. These represent the parameters of 
+your clause.  Has C<auto_deref> set, so you can say:
 
   my @params = $obj->params;
 
@@ -110,9 +122,8 @@ of subclauses recursively.
 
 =head1 get_params
 
-By default, this returns the same thing as C<params>. However, since many 
-clauses will need to contain other clauses, overriding this allows for a 
-simple mechanism for recursively picking up the params of subclauses.
+As of version 0.3, this will recurse into calling C<params> on subclauses by 
+default. It can be overriden to get only C<params> if need be.
 
 =head1 REQUIRED METHODS
 
