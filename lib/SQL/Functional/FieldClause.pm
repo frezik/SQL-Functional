@@ -28,8 +28,10 @@ use warnings;
 use Moose;
 use namespace::autoclean;
 use SQL::Functional::Clause;
+use SQL::Functional::FieldRole;
 
 with 'SQL::Functional::Clause';
+with 'SQL::Functional::FieldRole';
 
 has name => (
     is => 'ro',

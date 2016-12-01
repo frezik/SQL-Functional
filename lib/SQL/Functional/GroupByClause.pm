@@ -33,7 +33,7 @@ with 'SQL::Functional::Clause';
 
 has 'field' => (
     is => 'ro',
-    isa => 'SQL::Functional::FieldClause',
+    isa => 'SQL::Functional::FieldRole',
     required => 1,
 );
 

@@ -35,7 +35,7 @@ with 'SQL::Functional::Clause';
 
 has fields => (
     is => 'ro',
-    isa => 'ArrayRef[SQL::Functional::FieldClause]',
+    isa => 'ArrayRef[SQL::Functional::FieldRole]',
     required => 1,
     auto_deref => 1,
 );

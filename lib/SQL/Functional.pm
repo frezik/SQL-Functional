@@ -26,6 +26,7 @@ package SQL::Functional;
 use strict;
 use warnings;
 use SQL::Functional::AndClause;
+use SQL::Functional::CountClause;
 use SQL::Functional::DeleteClause;
 use SQL::Functional::DistinctClause;
 use SQL::Functional::FromClause;
@@ -92,6 +93,7 @@ our @EXPORT_OK = qw{
     DISTINCT
     func
     literal
+    COUNT
 };
 our @EXPORT = @EXPORT_OK;
 
@@ -106,17 +108,17 @@ sub SELECT ($$@)
 
     if( ref $fields eq 'ARRAY' ) {
         @fields = map {
-            (ref($_) && $_->isa( 'SQL::Functional::FieldClause' ))
+            (ref($_) && $_->does( 'SQL::Functional::FieldRole' ))
                 ? $_
                 : SQL::Functional::FieldClause->new({
                     name => $_,
                 });
         } @$fields;
     }
-    elsif( $fields->isa( 'SQL::Functional::FieldClause' ) ) {
+    elsif( ref $fields && $fields->does( 'SQL::Functional::FieldRole' ) ) {
         @fields = ($fields);
     }
-    elsif( $fields->isa( 'SQL::Functional::DistinctClause' ) ) {
+    elsif( ref $fields && $fields->isa( 'SQL::Functional::DistinctClause' ) ) {
         @fields = ($fields->fields);
         $is_distinct = 1;
     }
@@ -532,6 +534,35 @@ sub literal ($)
     return $clause;
 }
 
+sub COUNT ($)
+{
+    my ($fields) = @_;
+    my @fields;
+
+    if( ref $fields eq 'ARRAY' ) {
+        @fields = map {
+            (ref($_) && $_->isa( 'SQL::Functional::FieldClause' ))
+                ? $_
+                : SQL::Functional::FieldClause->new({
+                    name => $_,
+                });
+        } @$fields;
+    }
+    elsif( $fields->isa( 'SQL::Functional::FieldClause' ) ) {
+        @fields = ($fields);
+    }
+    else {
+        @fields = ( SQL::Functional::FieldClause->new({
+            name => $fields,
+        }) );
+    }
+    
+    my $clause = SQL::Functional::CountClause->new({
+        fields => \@fields,
+    });
+    return $clause;
+}
+
 
 1;
 __END__
@@ -881,6 +912,21 @@ function name, followed by any parameters.
 Creates a L<SQL::Functional::LiteralClause> and returns it. 
 Takes a string which will be put literally into the final SQL, rather than as 
 a placeholder.
+
+=head3 COUNT
+
+Creates a L<SQL::Functional::CountClause> and returns it. Takes a set of 
+fields, which could be passed as:
+
+=over 4
+
+=item * Scalar String -- for a single field
+
+=item * ArrayRef of Strings -- for several fields
+
+=item * An object that does L<SQL::Functional::FieldRole>.
+
+=back
 
 =head1 WRITING EXTENSIONS
 

@@ -4,6 +4,7 @@ Revision history for perl module SQL::Functional
 
 - Implement string literal clauses
 - ::Clause->get_params() recurses into subclauses by default
+- Add COUNT(...) clause
 
 0.2 2016-10-17
 

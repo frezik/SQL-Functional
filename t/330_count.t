@@ -21,33 +21,11 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 26;
+use Test::More tests => 1;
 use strict;
 use warnings;
+use SQL::Functional;
 
-use_ok( 'SQL::Functional::Clause' );
-use_ok( 'SQL::Functional::AndClause' );
-use_ok( 'SQL::Functional::CountClause' );
-use_ok( 'SQL::Functional::DistinctClause' );
-use_ok( 'SQL::Functional::TruncateClause' );
-use_ok( 'SQL::Functional::FieldClause' );
-use_ok( 'SQL::Functional::FromClause' );
-use_ok( 'SQL::Functional::GroupByClause' );
-use_ok( 'SQL::Functional::InsertClause' );
-use_ok( 'SQL::Functional::JoinClause' );
-use_ok( 'SQL::Functional::LimitClause' );
-use_ok( 'SQL::Functional::LiteralClause' );
-use_ok( 'SQL::Functional::MatchClause' );
-use_ok( 'SQL::Functional::NullClause' );
-use_ok( 'SQL::Functional::OrClause' );
-use_ok( 'SQL::Functional::OrderByClause' );
-use_ok( 'SQL::Functional::PlaceholderClause' );
-use_ok( 'SQL::Functional::UpdateClause' );
-use_ok( 'SQL::Functional::ValuesClause' );
-use_ok( 'SQL::Functional::VerbatimClause' );
-use_ok( 'SQL::Functional::WhereClause' );
-use_ok( 'SQL::Functional::WrapClause' );
-use_ok( 'SQL::Functional::TruncateClause' );
-use_ok( 'SQL::Functional::SelectClause' );
-use_ok( 'SQL::Functional::SetClause' );
-use_ok( 'SQL::Functional' );
+my ($sql, @sql_params) = SELECT COUNT(star), FROM 'foo';
+cmp_ok( $sql, 'eq', 'SELECT COUNT(*) FROM foo',
+    'Select statement with COUNT(*)' );
