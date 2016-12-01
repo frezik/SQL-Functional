@@ -1,6 +1,1 @@
-0.3 Release
-===========
-* Functional values:
-  INSERT ... VALUES ( to_timestamp($myDateString, 'YYYY-MM-DD') )
-    * This will need some refactoring of to_string() methods across many 
-      clauses
+
